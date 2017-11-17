@@ -1,0 +1,35 @@
+// Load in QH prototypes
+prots = new data.materials.CrystalStructureDataset
+prots add example-structures/QH-Li.poscar
+prots add example-structures/QH-Li2.poscar
+prots add example-structures/QH-Li3.poscar
+
+// Load dataset used to generate attributes
+data = load data.obj
+
+// Generate new quaternary heuslers
+//   The -voro tag tells Magpie to compute the Voronoi tessellation
+//   The -ignore flag indicates that Cu and Fe should not be substituted
+//   The $prots defines the list of prototypes to use (defined above)
+//   The last column is the elements allowed to substitute on to the sites
+// More details: http://oqmd.org/static/analytics/magpie/javadoc/magpie/data/utilities/generators/CombinatorialSubstitutionGenerator.html
+gen = new data.utilities.generators.CombinatorialSubstitutionGenerator -voro -style combinations -ignore $prots Ac Ag Al As Au B Ba Be Bi Ca Cd Ce Co Cr Cs Cu Dy Er Eu Fe Ga Gd Ge Hf Hg Ho In Ir K La Li Lu Mg Mn Mo Na Nb Nd Ni Np Os Pa Pb Pd Pm Pr Pt Pu Rb Re Rh Ru Sb Sc Si Sm Sn Sr Ta Tb Tc Te Th Ti Tl Tm U V W Y Yb Zn Zr
+
+// Filter out wildly unstable entries (> 100 meV/atom)
+filter = new data.utilities.filters.ClassFilter predicted < 0.1
+
+// Load in delta_e model
+model = load model.obj
+
+// Run model, generating attributes for 10000 entries at a time
+//  This means you don't have to hold all attributes in memory
+//  at the same time
+data modify AddPropertyModifier stability
+data target stability
+eval = new utility.tools.BatchModelEvaluator $model 10000
+eval add $data $gen include $filter
+
+// Save data
+save data heuslers poscar
+
+exit
