@@ -1,6 +1,7 @@
 import magpie.Magpie;
 import magpie.data.materials.{CrystalStructureDataset, CompositionDataset, CompositionEntry};
 import magpie.data.utilities.modifiers.StabilityCalculationModifier;
+import magpie.data.utilities.filters.PropertyRangeFilter;
 import magpie.data.materials.util.PropertyLists;
 import java.io.PrintWriter;
 import java.io.File;
@@ -27,6 +28,13 @@ def parseDirectory(dirName : String) : CrystalStructureDataset = {
     myData.importText(s"${dirName}", null);
     println(s"\t\tRead ${myData.NEntries} entries");
     myData.setTargetProperty("delta_e", true);
+
+    // Screen out unreasonable compounds
+    val filter = new PropertyRangeFilter();
+    filter.setOptions(Seq("measured", "delta_e", "inside", "-20", "5"));
+    filter.setExclude(false);
+    filter.filter(myData);
+
     return myData;
 }
 val dirs = List[String]("quat-heuslers", "heuslers", "oqmd-no-heusler");
@@ -56,6 +64,7 @@ stab.setStabilityName("my_stability");
 for ((n,d) <- data) {
     println(s"\tEvaluating $n");
     stab.transform(d);
+    d.setTargetProperty("delta_e", true);
 }
     
 // Compute attributes and save
