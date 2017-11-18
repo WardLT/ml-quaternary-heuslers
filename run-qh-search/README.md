@@ -7,3 +7,5 @@ This directory contains the input files needed to search for new quaternary heus
 - _example-structures_: Templates for the QH structure. Contains all three possible polymorphs at a single compositions.
 
 To run these two scripts, call `./run_all.bs`
+
+We also include the outputs of these scripts and the list of QHs that are predicted to be stable (see the `heuslers` directory)
