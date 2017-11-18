@@ -1,0 +1,39 @@
+qh_data = load ../datasets/quat-heuslers.obj 
+th_data = load ../datasets/heuslers.obj 
+oqmd_data = load ../datasets/oqmd-no-heusler.obj 
+train_data = oqmd_data clone 
+train_data add $qh_data 
+	Added 96188 entries from another dataset.
+train_data add $th_data 
+	Added 184094 entries from another dataset.
+delete qh_data oqmd_data th_data 
+model = new models.regression.WekaRegression trees.RandomForest -I 100 -K 0 -S 1 -num-slots 0 
+train_data target my_stability 
+	Set target property to my_stability
+model crossvalidate $train_data 10 
+model train $train_data 
+print model validation stats 
+
+Variable: model - Command: validation stats
+Number Tested: 426148
+Pearson's Correlation (R): 0.9600
+Spearman's Correlation (Rho): 0.9583
+Kendall's Correlation (Tau): 0.8408
+MAE: 7.0072e-02
+RMSE: 1.2073e-01
+MRE: NaN
+ROC AUC: 0.0584
+
+print model validation baseline 
+
+Variable: model - Command: validation baseline
+Mean absolute deviation: 0.3027
+Standard Deviation: 0.4153
+Median: 0.3949
+Range: 7.4961
+
+save model model 
+	Serialized model to model.obj
+save train_data data template 
+	Saved train_data to disk in template format to data.obj
+exit 

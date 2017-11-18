@@ -15,8 +15,11 @@ delete qh_data oqmd_data th_data
 model = new models.regression.WekaRegression trees.RandomForest -I 100 -K 0 -S 1 -num-slots 0
 
 train_data target my_stability
-model train $train_data
+//   Dev Note: We cross-validate first to lower memory consumption. Cross-validation makes a copy
+//             of the model, and if we run it before training the model that copy is much smaller 
+//             because it has no weights associated with it.
 model crossvalidate $train_data 10
+model train $train_data
 
 // Print the validation stats and baseline measures of the test set
 print model validation stats

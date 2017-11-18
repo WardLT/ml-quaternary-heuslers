@@ -1,0 +1,21 @@
+prots = new data.materials.CrystalStructureDataset 
+prots add example-structures/QH-Li.poscar 
+	Added 1 entries.
+prots add example-structures/QH-Li2.poscar 
+	Added 1 entries.
+prots add example-structures/QH-Li3.poscar 
+	Added 1 entries.
+data = load data.obj 
+gen = new data.utilities.generators.CombinatorialSubstitutionGenerator -voro -style combinations -ignore $prots Ac Ag Al As Au B Ba Be Bi Ca Cd Ce Co Cr Cs Cu Dy Er Eu Fe Ga Gd Ge Hf Hg Ho In Ir K La Li Lu Mg Mn Mo Na Nb Nd Ni Np Os Pa Pb Pd Pm Pr Pt Pu Rb Re Rh Ru Sb Sc Si Sm Sn Sr Ta Tb Tc Te Th Ti Tl Tm U V W Y Yb Zn Zr 
+filter = new data.utilities.filters.ClassFilter predicted < 0.1 
+model = load model.obj 
+data modify AddPropertyModifier stability 
+	Modified dataset using a AddPropertyModifier
+data target stability 
+	Set target property to stability
+eval = new utility.tools.BatchModelEvaluator $model 10000 
+eval add $data $gen include $filter 
+	Added 1922 entries created using a CombinatorialSubstitutionGenerator that passed a ClassFilter
+save data heuslers poscar 
+	Saved data to disk in poscar format to heuslers
+exit 
