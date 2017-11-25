@@ -56,7 +56,7 @@ Source.fromFile("qh-training-set.list").getLines.drop(1).map(_.split(" ")).forea
 val model = new CumulantExpansionClassifier();
 model.setNBins(Array[Int](30,120,120));
 model.setNComponents(4);
-model.defineKnownCompounds("../oqmd_prototypes.list");
+model.defineKnownCompounds("../label-prototypes/oqmd_prototypes.list");
 
 // Run CV tests
 var scores = List[Int]();

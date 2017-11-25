@@ -57,16 +57,16 @@ List[String]("heuslers", "oqmd-no-heusler").map(data(_)).foreach(extractComposit
 println(s"\tNumber of phases: ${noQHData.NEntries()}");
 
 val stab = new StabilityCalculationModifier();
-stab.setCompounds(noQHData.asInstanceOf[CompositionDataset]);
+stab.setCompounds(noQHData);
 stab.setEnergyName("delta_e");
 stab.setStabilityName("my_stability");
 
 for ((n,d) <- data) {
     println(s"\tEvaluating $n");
     stab.transform(d);
-    d.setTargetProperty("delta_e", true);
+    d.setTargetProperty("my_stability", true);
 }
-    
+
 // Compute attributes and save
 println("Computing attributes...");
 data.foreach({case (name, data) => data.generateAttributes()})
