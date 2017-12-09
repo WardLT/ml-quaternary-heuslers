@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NPROCS=1
-magpie="java -Xmx31g -jar ../magpie/dist/Magpie.jar"
+magpie="java -Xmx15g -jar ../magpie/dist/Magpie.jar"
 
 $magpie make-model.in | tee make-model.out 
 $magpie -n $NPROCS run-search-iterative.in | tee run-search-iterative.out 

@@ -10,6 +10,8 @@ data = load data.obj
 // Generate new quaternary heuslers
 //   The -voro tag tells Magpie to compute the Voronoi tessellation
 //   The -ignore flag indicates that Cu and Fe should not be substituted
+//   The -style flag indicates that we should decorate the structure with
+//              the combination of all elements (as opposed to permutations)
 //   The $prots defines the list of prototypes to use (defined above)
 //   The last column is the elements allowed to substitute on to the sites
 // More details: http://oqmd.org/static/analytics/magpie/javadoc/magpie/data/utilities/generators/CombinatorialSubstitutionGenerator.html

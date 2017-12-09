@@ -16,13 +16,13 @@ print model validation stats
 
 Variable: model - Command: validation stats
 Number Tested: 426148
-Pearson's Correlation (R): 0.9600
-Spearman's Correlation (Rho): 0.9583
-Kendall's Correlation (Tau): 0.8408
-MAE: 7.0072e-02
-RMSE: 1.2073e-01
+Pearson's Correlation (R): 0.9602
+Spearman's Correlation (Rho): 0.9585
+Kendall's Correlation (Tau): 0.8413
+MAE: 6.9793e-02
+RMSE: 1.2044e-01
 MRE: NaN
-ROC AUC: 0.0584
+ROC AUC: 0.0582
 
 print model validation baseline 
 

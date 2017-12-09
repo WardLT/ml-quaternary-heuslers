@@ -15,7 +15,7 @@ data target stability
 	Set target property to stability
 eval = new utility.tools.BatchModelEvaluator $model 10000 
 eval add $data $gen include $filter 
-	Added 1922 entries created using a CombinatorialSubstitutionGenerator that passed a ClassFilter
+	Added 1734 entries created using a CombinatorialSubstitutionGenerator that passed a ClassFilter
 save data heuslers poscar 
 	Saved data to disk in poscar format to heuslers
 exit 
