@@ -1,0 +1,15 @@
+#! /bin/bash
+jupyter="jupyter nbconvert --execute --ExecutePreprocessor.timeout=-1 --inplace"
+
+# Run Faber, which generates inputs for DMSP
+$jupyter faber-method.ipynb
+
+# Run the DMSP test
+scala -J-Xmx4g -cp ../magpie/dist/Magpie.jar run-dmsp.scala
+
+# Run Faber method with Ward attributes
+$jupyter ward-faber-compare.ipynb
+
+# Run RF models, make charts
+$jupyter compare-methods.ipynb
+$jupyter plot-results.ipynb

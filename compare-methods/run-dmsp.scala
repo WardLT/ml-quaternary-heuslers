@@ -11,7 +11,7 @@ import scala.io.Source;
 
 // Adjustable settings
 Magpie.NThreads = 4;
-val train_size = 1000;
+val train_sizes = Array[Int](1,10,100,1000,10000);
 val test_size = 20000;
 val n_repeats = 25;
 val pick_size = 50;
@@ -59,34 +59,38 @@ model.setNComponents(4);
 model.defineKnownCompounds("../label-prototypes/oqmd_prototypes.list");
 
 // Run CV tests
-var scores = List[Int]();
 val ranker = new ClassProbabilityRanker("Stable");
 ranker.setUseMeasured(false);
 ranker.setMaximizeFunction(true);
-for (test <- 0 until n_repeats) {
-	val full_data = qh_data.clone();
-	val train_data = full_data.getRandomSplit(train_size);
-	val test_data = full_data.getRandomSplit(test_size);
-	
-	model.train(train_data);
-	model.run(test_data);
-	
-	ranker.train(test_data);
-	ranker.sortByRanking(test_data);
-	
-	var n_hits = 0;
-	for (i <- 0 until pick_size) {
-		if (test_data.getEntry(i).getMeasuredClass() == 0) {
-			n_hits += 1;
-		}
-	}
-	scores = n_hits :: scores;
-	println(s"$test: $n_hits")
-}
-
 // print results to a JSON-like file
 val fp = new PrintWriter("dmsp.json");
-fp.print("[");
-fp.print(scores.map(x => s"$x").mkString(","))
-fp.println("]");
+fp.println("{");
+for ((train_size, count) <- train_sizes.zipWithIndex) {
+	var scores = List[Int]();
+	for (test <- 0 until n_repeats) {
+		val full_data = qh_data.clone();
+		val train_data = full_data.getRandomSplit(train_size);
+		val test_data = full_data.getRandomSplit(test_size);
+		
+		model.train(train_data);
+		model.run(test_data);
+		
+		ranker.train(test_data);
+		ranker.sortByRanking(test_data);
+		
+		var n_hits = 0;
+		for (i <- 0 until pick_size) {
+			if (test_data.getEntry(i).getMeasuredClass() == 0) {
+				n_hits += 1;
+			}
+		}
+		scores = n_hits :: scores;
+		print(s"\rTrain size: ${train_size} - ${test + 1}/$n_repeats");
+	}
+	println(s"\rTrain size: ${train_size} - Done   ");
+	fp.print(s"""  "${train_size}" : [""");
+	fp.print(scores.map(x => s"$x").mkString(","))
+	fp.println(if (count == (train_sizes.length - 1)) "]" else "],");
+}
+fp.println("}");
 fp.close();
