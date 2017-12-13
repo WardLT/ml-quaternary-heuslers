@@ -22,28 +22,20 @@ import pickle as pkl
 
 # ## Load in the QHs
 
-# In[ ]:
-
 def load_dataset(source):
-    d = pd.read_csv(os.path.join('datasets', source, 'properties.txt'), delim_whitespace=True)
+    d = pd.read_csv(os.path.join('..', 'datasets', source, 'properties.txt'), delim_whitespace=True)
     d['source'] = source
     d['composition'] = d['filename'].apply(lambda x: Composition(x.split("-")[-1]))
     return d
 
 
-# In[ ]:
-
 qh_data = load_dataset('quat-heuslers')
 
-
-# In[ ]:
 
 print('Loaded %d OQMD entries. %d are missing stabilities'%(len(qh_data), qh_data['stability'].isnull().sum()))
 
 
 # Get element list
-
-# In[ ]:
 
 heusler_elems = set(sum([x.keys() for x in qh_data['composition']], []))
 print('%d elements in QH set'%len(heusler_elems))
@@ -51,8 +43,6 @@ print('%d elements in QH set'%len(heusler_elems))
 
 # ## Get the Stable OQMD/Heusler Entries
 # These are going to serve as the prototype library for DMSP
-
-# In[ ]:
 
 all_oqmd = pd.concat([
     load_dataset(x) for x in ['oqmd-no-heusler', 'heuslers']
@@ -63,13 +53,9 @@ all_oqmd['stability'] = all_oqmd['stability'].convert_objects(convert_numeric=Tr
 print('Loaded %d OQMD entries. %d are missing stabilities'%(len(all_oqmd), all_oqmd['stability'].isnull().sum()))
 
 
-# In[ ]:
-
 def contains_only_QH_elements(comp):
     return all([x in heusler_elems for x in comp.keys()])
 
-
-# In[ ]:
 
 all_oqmd = all_oqmd[all_oqmd['composition'].apply(contains_only_QH_elements)]
 print('%d contain only QH elements'%len(all_oqmd))
@@ -80,23 +66,16 @@ print('%d contain only QH elements'%len(all_oqmd))
 
 # Label the elements
 
-# In[ ]:
-
 all_oqmd['system'] = all_oqmd['composition'].apply(lambda x: "-".join(sorted([y.symbol for y in x.keys()])))
 
 
 # Compute stability for each system
 
-# In[ ]:
-
 def get_pdentry(row, attribute=None):
     comp = Composition(row['filename'].split("-")[-1])
     return PDEntry(comp.fractional_composition, row['delta_e'], comp.reduced_formula,
-                   os.path.join('datasets', row['source'], row['filename']))
+                   os.path.join('..', 'datasets', row['source'], row['filename']))
 all_oqmd['pdentry'] = all_oqmd.apply(lambda x: get_pdentry(x), axis=1)
-
-
-# In[ ]:
 
 def get_data_from_system(data, system):
     """Extract rows from a pandas array that are in a certain phase diagram
@@ -115,8 +94,6 @@ def get_data_from_system(data, system):
     return data.query(query_str)
 
 
-# In[ ]:
-
 def compute_stability(data):
     """Compute the stability of all entries
     
@@ -131,8 +108,6 @@ def compute_stability(data):
 
 # Compute the phase diagram
 
-# In[ ]:
-
 n_systems = len(set(all_oqmd[all_oqmd['stability'].isnull()]['system']))
 for i, (gid, group) in enumerate(all_oqmd[all_oqmd['stability'].isnull()].groupby('system')):
     my_data = get_data_from_system(all_oqmd, gid.split('-'))
@@ -144,23 +119,17 @@ print()
 
 # Get all the stable entries
 
-# In[ ]:
-
 all_oqmd.query('stability <= 0', inplace=True)
 print('There are %d stable entries in the OQMD'%len(all_oqmd))
 
 
 # ## Find the prototypes
-# Get the prototypes
-
-# In[ ]:
 
 def get_path(entry):
-    return os.path.join('datasets', entry['source'], entry['filename'].rstrip())
+    return os.path.join('..', 'datasets', entry['source'], entry['filename'].rstrip())
 
 
-# In[ ]:
-
+# Run the test
 prototype_dict = {}
 failure_count = 0
 for i,(_,entry) in enumerate(all_oqmd.iterrows()):
@@ -169,18 +138,17 @@ for i,(_,entry) in enumerate(all_oqmd.iterrows()):
     except:
         print('Entry failed: ' + entry['filename'], file=sys.stderr)
     print('\r%d/%d'%(i + 1, len(all_oqmd)), end="")
+    sys.stdout.flush()
 print('Identified %d prototypes. Errors=%d'%(len(prototype_dict), failure_count))
 
 
-# In[ ]:
+
+# Save them
+PrototypeLibraryFactory.save_to_directory(prototype_dict, 'prototypes')
 
 with open('oqmd_prototypes.list', 'w') as fp:
     for p,exs in prototype_dict.items():
         for ex in exs:
             print('%s %s'%(ex, p.name), file=fp)
-
-
-# In[ ]:
-
 
 
