@@ -11,7 +11,7 @@ import scala.io.Source;
 
 // Adjustable settings
 Magpie.NThreads = 4;
-val train_sizes = Array[Int](1,10,100,1000,10000);
+val train_sizes = Array[Int](1,10,100,1000,10000,75000);
 val test_size = 20000;
 val n_repeats = 25;
 val pick_size = 50;
