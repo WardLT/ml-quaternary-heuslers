@@ -1,0 +1,8 @@
+pymatgen
+matplotlib
+pandas
+scikit-learn
+numpy
+scipy
+matminer
+tqdm
